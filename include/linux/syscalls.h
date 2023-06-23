@@ -80,6 +80,9 @@ union bpf_attr;
 #include <linux/quota.h>
 #include <linux/key.h>
 #include <trace/syscall.h>
+// start os p1
+#include <linux/pf_syscalls.h>
+// end os p1
 
 /*
  * __MAP - apply a macro to syscall arguments
@@ -940,5 +943,9 @@ asmlinkage long sys_pkey_alloc(unsigned long flags, unsigned long init_val);
 asmlinkage long sys_pkey_free(int pkey);
 asmlinkage long sys_statx(int dfd, const char __user *path, unsigned flags,
 			  unsigned mask, struct statx __user *buffer);
+/* 3 system call declarations project 1 os */
+asmlinkage long sys_pf_set_param(const char *process_name, size_t name_len);
+asmlinkage long sys_pf_get_info(const char *process_name, size_t name_len, struct pf_stat *pf);
+asmlinkage long sys_pf_cleanup(void);
 
 #endif

@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[left=1.5cm, right=2cm]{geometry}
+\title{Operating systems Project 01}
+% ==============================================================================
+
+\author{
+  Hogge , Louis, s192814 \\
+  \texttt{\textbf{louis.hogge@student.uliege.be}}
+  \and
+  Romoli, Raphael, s182115\\
+  \texttt{raphael.romoli@student.uliege.be}
+}
+\title{Operating Systems Project 01}
+\date{}
+\begin{document}
+  \maketitle
+  \section{Implementation}
+  To help us in our implementation we used several functions in addition to the principal one:
+  \subsection{Functions and structures}
+    \begin{enumerate}
+        \item The \texttt{ get\_process\_info} function is designed to find and return a pointer to a \texttt{process\_info} structure in the global hash table, given a process name and its length.( used in several functions)
+        \item \texttt{is\_tracked\_process} function is designed to check if a given process (identified by its name and length) is being tracked in the global hash table of process information. It returns true if the process is tracked and false otherwise.
+        \item \texttt{find\_task\_by\_comm} function is designed to search for a task (a process) with the given process name. It iterates through all tasks in the system and returns a pointer to the \texttt{task\_struct} of the target process if it's found, or NULL if the process is not found. ( used in the \texttt{update\_process\_vma})
+        \item  The \texttt{update\_process\_vma} function updates the VMA information for a given process.
+        \item  The \texttt{update\_process\_cow\_page\_faults} function updates the statistics of Copy-On-Write (COW) page faults for a given process. It increments the total count of COW page faults and then iterates through the VMAs of the process. If the provided address lies within a VMA, it increments the fault count for that VMA and exits the loop.
+        \item The struct \texttt{process\_info} defines a data structure to store information about a process. It contains the process name, name length, a \texttt{pf\_stat} structure for storing page fault statistics, and a \texttt{hlist\_node} for organizing the data in a hash table.
+    \end{enumerate}   
+  \subsection{\texttt{pf\_set\_param}}
+    Initialize the hash global table if not already done. \\Copy the process name from user space to kernel space. \\Check if the process is already being tracked using \texttt{ get\_process\_info} function.\\ If the process is not being tracked, allocate memory for a new \texttt{process\_info} struct and populate it. \\Add the new \texttt{process\_info} struct to the global hash table.
+\subsection{\texttt{pf\_get\_info}}
+ Copy the process name from user space to kernel space. \\
+Find the \texttt{process\_info} struct using \texttt{ get\_process\_info} function.\\
+Copy the \texttt{pf\_stat} structure from the \texttt{process\_info} struct in kernel space to the user space memory pointed to by \texttt{pf}.\\
+\subsection{\texttt{pf\_cleanup}}
+Iterate through the hash table, performing the following actions for each \texttt{process\_info} struct:
+    Remove the \texttt{process\_info} struct from the hash table. \\
+    Free the memory allocated for the \texttt{process\_info} struct.\\
+    Set the \texttt{cleaned\_up} flag to true, indicating that at least one \texttt{process\_info} struct has been cleaned up.\\
+    Reset the \texttt{hash\_table\_initialized} flag to false, allowing the hash table to be reinitialized upon the next use.\\
+\subsection{Others}
+\begin{itemize}
+    \item We used a new file to write all of our syscalls, this file is located in the kernel folder. We thus added this file in the corresponding Makefile.
+    \item We added our 3 systems calls to /arch/x86/entry/syscalls/syscall\_32.tbl.
+    \item We added a file in /include/linux called pf\_syscalls.h to store our prototypes.
+    \item We modified the file \texttt{/arch/x86/mm/fault.c} to use our function \texttt{update\_process\_vma} and \texttt{update\_process\_cow\_page\_faults} with respect to those flags : (\texttt{FAULT\_FLAG\_WRITE}, \texttt{FAULT\_FLAG\_USER},\texttt{VM\_HUGEPAGE})
+\end{itemize}
+\subsection{Memory management}
+When a process requires additional memory, it sends a request to the kernel for allocation. In response, the kernel creates a new Virtual Memory Area (VMA) that satisfies the necessary size and permission criteria. Subsequently, the kernel updates the process's page table, which is responsible for translating virtual addresses employed by processes into corresponding physical memory addresses. VMAs represent contiguous regions within a process's virtual memory address space, with each VMA possessing a distinct start address, end address, and a set of attributes. This mechanism enables efficient memory management and allocation for processes.
+\end{document}

@@ -1579,6 +1579,10 @@ D: hwmon subsystem maintainer
 D: i2c-sis96x and i2c-stub SMBus drivers
 S: USA
 
+N: Louis Hogge
+E: louis.hogge@student.uliege.be
+D: student hacking the kernel for OS course ULiège
+
 N: Dirk Hohndel
 E: hohndel@suse.de
 D: The XFree86[tm] Project
@@ -3153,6 +3157,10 @@ D: shm fs, SYSV semaphores, af_unix
 S: Neue Heimat Str. 8
 S: D-68789 St.Leon-Rot
 S: Germany
+
+N: Raphael Romoli
+E: raphael.romoli@student.uliege.be
+D: student hacking the kernel for OS course ULiège
 
 N: Thiago Berlitz Rondon
 E: maluco@mileniumnet.com.br

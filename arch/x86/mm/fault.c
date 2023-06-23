@@ -28,6 +28,11 @@
 #define CREATE_TRACE_POINTS
 #include <asm/trace/exceptions.h>
 
+// start os p1
+#include <linux/pf_syscalls.h>
+// end os p1
+
+
 /*
  * Returns 0 if mmiotrace is disabled, or if the fault is not
  * handled by mmiotrace:
@@ -1244,6 +1249,9 @@ __do_page_fault(struct pt_regs *regs, unsigned long error_code,
 	int fault, major = 0;
 	unsigned int flags = FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE;
 	u32 pkey;
+	// start os p1
+	size_t name_len;
+	// end os p1
 
 	tsk = current;
 	mm = tsk->mm;
@@ -1406,6 +1414,21 @@ good_area:
 		bad_area_access_error(regs, error_code, address, vma);
 		return;
 	}
+
+	// start os p1
+        name_len = strnlen(current->comm, TASK_COMM_LEN);
+
+	// Check if process is tracked
+	if (is_tracked_process(current->comm, name_len)) {
+		update_process_vma(current->comm, name_len);
+
+		// Check if COW page fault
+        	if ((flags & FAULT_FLAG_WRITE) && (flags & FAULT_FLAG_USER) && !(vma->vm_flags & VM_HUGEPAGE)) {
+                	update_process_cow_page_faults(current->comm, name_len, address);
+		} 
+    	}
+    	// end os p1
+
 
 	/*
 	 * If for any reason at all we couldn't handle the fault,
